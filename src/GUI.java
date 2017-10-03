@@ -59,12 +59,17 @@ public class GUI extends JComponent {
                                     @Override
                                     public void actionPerformed(ActionEvent e) {
                                         try {
-                                            hextess.redraw(input.getText());
+                                            hextess.initialise(input.getText());
                                         } catch(IllegalArgumentException exc) {
+                                            String title = "Out of bounds";
+                                            if(exc instanceof NumberFormatException)
+                                                title = "Invalid Input";
+
                                             JOptionPane.showMessageDialog(frame,
-                                                exc.getMessage(), "Out of Bounds", JOptionPane.WARNING_MESSAGE);
+                                                exc.getMessage(), title, JOptionPane.WARNING_MESSAGE);
                                         }
-                                        //redraw();
+
+                                        hextess.draw();
                                     }
                                 });
         input.setToolTipText("Enter size (0-20)");

@@ -20,7 +20,7 @@ public class HexTess {
     private double[] hexBotY = new double[6];
 
 
-    public void redraw(String size) {
+    public void setSize(String size) throws NumberFormatException, IllegalFormatException{
         try {
             int tessSize = Integer.parseInt(size);
             if(tessSize > 20 || tessSize < 0)
@@ -32,14 +32,22 @@ public class HexTess {
         } catch(IllegalArgumentException e) {
             throw new IllegalArgumentException(e.getMessage());
         }
-        initialise();
     }
     /** Asks for a size to scale the tessellation and prepares data structures to draw
      */
-    public void initialise() {
+    public void initialise(String size) throws IllegalFormatException{
+        try {
+            setSize(size);
+        } catch(IllegalFormatException e) {
+            throw new IllegalArgumentException(e.getMessage());
+        }
         shapes = new ArrayList<Shape>();
-
         sixth = SIZE / 6.0;
+    }
+
+    public void draw() {
+        tessie(0, 0, false, Color.red);
+        tessie(0, SIZE, true, Color.red);
     }
 
     /** Initialises x and y position arrays with initial values based on whether we are drawing top or bottom of tessellation.
