@@ -2,6 +2,7 @@ import java.awt.*;
 import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
 import java.util.*;
+import java.util.List;
 
 /**
  * Created by Dan Ko on 9/12/2017.
@@ -10,8 +11,8 @@ public class HexTess {
     private double SIZE = 0;
     private double sixth;
     //private List<Shape> shapes = new ArrayList<Shape>();
-    private java.util.List<Shape> shapes;
-    //fields used in tessie and its submethods
+    private List<Shape> shapes;
+    //fields used in initTessie and its submethods
     private double[] xC;
     private double[] yC;
     private double[] hexX;
@@ -33,7 +34,7 @@ public class HexTess {
             throw new IllegalArgumentException(e.getMessage());
         }
     }
-    /** Asks for a size to scale the tessellation and prepares data structures to draw
+    /** Asks for a size to scale the tessellation and prepares data structures to evalShapes
      */
     public void initialise(String size) throws IllegalFormatException{
         try {
@@ -45,35 +46,38 @@ public class HexTess {
         sixth = SIZE / 6.0;
     }
 
-    public void draw() {
-        tessie(0, 0, false, Color.red);
-        tessie(0, SIZE, true, Color.red);
+    public List<Shape> evalShapes() {
+        initTessie(0, 0, false, Color.red);
+        initTessie(0, SIZE, true, Color.blue);
+
+        return this.shapes;
     }
 
     /** Initialises x and y position arrays with initial values based on whether we are drawing top or bottom of tessellation.
-     *   Once everything is prepared, it fires off 5 shapes to run through the algorithm in tessieDraw
+     *   Once everything is prepared, it fires off 5 shapes to run through the algorithm in recordPath
      */
-    public void tessie(double x, double y, boolean bot, Color color) {
+    public void initTessie(double x, double y, boolean bot, Color color) {
 
         /** arrays to record coordinates **/
 
         // x will always be the same as we traverse from left to right
-        double[] xT = { x, x + sixth, x, x };
-        // y will not always be constant, depending on if we are working on the top or bot wall
-        double[] yT = { y, y + (2.0 * sixth), y + (2 * sixth), y + (2 * sixth) };
+        double[] xCoordsInitial = { x, x + sixth, x, x };
+        // setting y as if we were traversing top
+        double[] yCoordsInitial = { y, y + (2.0 * sixth), y + (2 * sixth), y + (2 * sixth) };
 
-        xC = xT;
-        yC = yT;
         if (bot)
-            yC = flipper(yC, y); // flipping y values to the bottom side
+            yCoordsInitial = flipper(yCoordsInitial, y); // flipping y values to the bottom side
+
+        xC = xCoordsInitial;
+        yC = yCoordsInitial;
 
         /** hexagonal points **/ // we will be collecting x and y points from triangles
 
         hexX = new double[6];
         hexY = new double[6];
 
-        for (int i = 0; i < 5; i++) { // we draw 5 tesselating shapes from left to right on both the top and bottom.
-            tessieDraw(i, bot);
+        for (int i = 0; i < 5; i++) { // we evalShapes 5 tesselating shapes from left to right on both the top and bottom.
+            recordPath(i, bot);
         }
     }
 
@@ -82,32 +86,30 @@ public class HexTess {
      *   making use of duplicate vertices for the next shape.
      *   Each if case is a single shape!
      */
-    public void tessieDraw(int shapeNum, boolean bot) {
+    public void recordPath(int shapeNum, boolean isBot) {
 
         if (shapeNum == 0) { //left triangle + left square (latter only draws on top side iteration)
             Path2D.Double triLeft = new Path2D.Double();
             addShape(triLeft);
-            triLeft.closePath();
 
-            if (!bot)
+            if (!isBot)
                 shapes.add(new Rectangle2D.Double(xC[2], yC[2], sixth, 2.0 * sixth)); // leftmost rect draws once
 
-            hexdex(0, true, bot, xC[1]); // hexagon coordinates are updated
-            hexdex(0, false, bot, yC[1]);
+            hexdex(0, true, isBot, xC[1]); // hexagon coordinates are updated
+            hexdex(0, false, isBot, yC[1]);
 
         } else if (shapeNum == 1) { //tilted left square
             xC[3] = xC[2] + 2 * sixth;
             yC[3] = yC[0];
             xC[2] = xC[1] + 2 * sixth;
 
-            if (!bot)
+            if (!isBot)
                 yC[2] = yC[1] - sixth; // drawing for top/bot slightly different for this point only. See shapeNum==3 case.
             else
                 yC[2] = yC[1] + sixth;
 
             Path2D.Double tiltedSqLeft = new Path2D.Double();
             addShape(tiltedSqLeft);
-            tiltedSqLeft.closePath();
 
         } else if (shapeNum == 2) { //middle inverted triangle
             xC[0] = xC[3] + 2 * sixth;
@@ -118,24 +120,22 @@ public class HexTess {
 
             Path2D.Double midTri = new Path2D.Double();
             addShape(midTri);
-            midTri.closePath();
 
-            hexdex(1, true, bot, xC[1]);  //update coordinates again
-            hexdex(1, false, bot, yC[1]);
+            hexdex(1, true, isBot, xC[1]);  //update coordinates again
+            hexdex(1, false, isBot, yC[1]);
 
         } else if (shapeNum == 3) { //tilted right square
             xC[3] = xC[0] + 2 * sixth;
             yC[3] = yC[0];
             xC[2] = xC[1] + 2 * sixth;
 
-            if (!bot)
+            if (!isBot)
                 yC[2] = yC[1] + sixth;
             else
                 yC[2] = yC[1] - sixth;
 
             Path2D.Double tiltedSqRight = new Path2D.Double();
             addShape(tiltedSqRight);
-            tiltedSqRight.closePath();
 
         } else if (shapeNum == 4) { //right triangle + right rectangle (latter only draws on top side iteration)
             xC[0] = xC[3];
@@ -144,19 +144,21 @@ public class HexTess {
             triPrep(yC);
             Path2D.Double rightTri = new Path2D.Double();
             addShape(rightTri);
-            rightTri.closePath();
 
-            if (!bot)
+            if (!isBot)
                 shapes.add(new Rectangle2D.Double(xC[1], yC[1], sixth, 2.0 * sixth)); // rightmost rect draws once
-            hexdex(2, true, bot, xC[1]);
-            hexdex(2, false, bot, yC[1]);
+            hexdex(2, true, isBot, xC[1]);
+            hexdex(2, false, isBot, yC[1]);
         }
     }
 
     private void addShape(Path2D.Double path) {
+        path.moveTo(xC[0], yC[0]);
         for(int i = 0; i < xC.length; i++) {
             path.lineTo(xC[i], yC[i]);
         }
+        path.closePath();
+
         shapes.add(path);
     }
 
@@ -169,21 +171,21 @@ public class HexTess {
         return mirror;
     }
 
-    /** The algorithm is considering each shape to have 4 vertices as it is the largest-vertexed shape we draw. When
+    /** The algorithm is considering each shape to have 4 vertices as it is the largest-vertexed shape we evalShapes. When
      *   encountering triangles, we record the "4th point" to be the same as its 3rd point. Therefore this method will
      *   only be called in cases where we record triangles
      */
-    private double[] triPrep(double[] tri) { // 2->1, 3->2 for triangle coordinates only
+    private double[] triPrep(double[] recordThreePoints) { // 2->1, 3->2 for triangle coordinates only
         for (int t = 1; t < 3; t++)
-            tri[t] = tri[t + 1];
+            recordThreePoints[t] = recordThreePoints[t + 1];
 
-        return tri;
+        return recordThreePoints;
     }
 
     /** To record the outline of the hexagon, we record its vertices whenever a shape shares a corner with it
      */
-    private void hexdex(int index, boolean x, boolean bot, double val) {
-        if (!bot) {
+    private void hexdex(int index, boolean x, boolean isBot, double val) {
+        if (!isBot) {
             if (x)
                 hexX[index] = val;
             else

@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 public class GUI extends JComponent {
 
@@ -21,7 +22,7 @@ public class GUI extends JComponent {
 //        Graphics2D g2 = (Graphics2D) g;
 //        if(!shapes.isEmpty() && shapes != null) {
 //            for(Shape shape : shapes) {
-//                g2.draw(shape);
+//                g2.evalShapes(shape);
 //            }
 //        }
     }
@@ -69,7 +70,10 @@ public class GUI extends JComponent {
                                                 exc.getMessage(), title, JOptionPane.WARNING_MESSAGE);
                                         }
 
-                                        hextess.draw();
+                                        List<Shape> shapes = hextess.evalShapes();
+                                        Graphics2D g2d = (Graphics2D) drawing.getGraphics();
+                                        for(Shape s : shapes)
+                                            g2d.draw(s);
                                     }
                                 });
         input.setToolTipText("Enter size (0-20)");
