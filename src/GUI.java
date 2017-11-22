@@ -13,8 +13,9 @@ public class GUI extends JComponent {
     private JPanel tool;
     private JComponent drawing;
     private JTextField input;
-
+    private Graphics2D g2d;
     private HexTess hextess;
+    private int i;
 
 
 
@@ -48,15 +49,17 @@ public class GUI extends JComponent {
         addPainter();
 
         frame.add(tool, BorderLayout.PAGE_START);
-        frame.add(display);
+        frame.add(display, BorderLayout.CENTER);
         frame.pack();
         frame.setLocationRelativeTo(null); // window appears in center
+    
+        g2d = (Graphics2D) drawing.getGraphics();
     }
 
     private void addSizeInputBox() {
         input = new JTextField(5);
         input.setMaximumSize(new Dimension(0, 25));
-        input.addActionListener(new ActionListener() { //on pressing enter, give the hextess a new size
+        input.addActionListener(new ActionListener() { //on pressing enter, redraw hextess
                                     @Override
                                     public void actionPerformed(ActionEvent e) {
                                         try {
@@ -69,11 +72,12 @@ public class GUI extends JComponent {
                                             JOptionPane.showMessageDialog(frame,
                                                 exc.getMessage(), title, JOptionPane.WARNING_MESSAGE);
                                         }
-
+                                        
                                         List<Shape> shapes = hextess.evalShapes();
-                                        Graphics2D g2d = (Graphics2D) drawing.getGraphics();
+                                        
                                         for(Shape s : shapes)
                                             g2d.draw(s);
+                                        System.out.println(i++);
                                     }
                                 });
         input.setToolTipText("Enter size (0-20)");
@@ -94,6 +98,7 @@ public class GUI extends JComponent {
 
         drawing.setPreferredSize(new Dimension(800,
                 500));
+        drawing.setBorder(BorderFactory.createBevelBorder(2));
         display.add(drawing);
     }
 

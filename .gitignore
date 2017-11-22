@@ -15,6 +15,10 @@
 # User-specific stuff:
 .idea/**/workspace.xml
 .idea/**/tasks.xml
+.idea/kotlinc.xml
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
 .idea/dictionaries
 
 # Sensitive or high-churn files:
@@ -28,6 +32,8 @@
 
 # IntelliJ
 out/
+
+# *.iml
 
 
 # OS generated files #

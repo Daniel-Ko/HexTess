@@ -24,7 +24,7 @@ public class HexTess {
     public void setSize(String size) throws NumberFormatException, IllegalFormatException{
         try {
             int tessSize = Integer.parseInt(size);
-            if(tessSize > 20 || tessSize < 0)
+            if(tessSize > 300 || tessSize < 0)
                 throw new IllegalArgumentException("Choose a size (0-20)");
             SIZE = tessSize;
 
@@ -56,7 +56,7 @@ public class HexTess {
     /** Initialises x and y position arrays with initial values based on whether we are drawing top or bottom of tessellation.
      *   Once everything is prepared, it fires off 5 shapes to run through the algorithm in recordPath
      */
-    public void initTessie(double x, double y, boolean bot, Color color) {
+    private void initTessie(double x, double y, boolean bot, Color color) {
 
         /** arrays to record coordinates **/
 
@@ -86,7 +86,7 @@ public class HexTess {
      *   making use of duplicate vertices for the next shape.
      *   Each if case is a single shape!
      */
-    public void recordPath(int shapeNum, boolean isBot) {
+    private void recordPath(int shapeNum, boolean isBot) {
 
         if (shapeNum == 0) { //left triangle + left square (latter only draws on top side iteration)
             Path2D.Double triLeft = new Path2D.Double();
