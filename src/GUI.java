@@ -1,36 +1,21 @@
+
+
 import javax.swing.*;
-
-
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.List;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 
 public class GUI extends JComponent {
 
     private JFrame frame;
     private JPanel display;
     private JPanel tool;
-    private JComponent drawing;
+    private GUICanvas drawing;
     private JTextField input;
-    private Graphics2D g2d;
     private HexTess hextess;
-    private int i;
-
-
-
-    protected void redraw(Graphics g) {
-//        Graphics2D g2 = (Graphics2D) g;
-//        if(!shapes.isEmpty() && shapes != null) {
-//            for(Shape shape : shapes) {
-//                g2.evalShapes(shape);
-//            }
-//        }
-    }
-
+    
+    
+    
     public GUI() {
-        hextess = new HexTess();
-
         frame = new JFrame();
         frame = new JFrame();
         frame.getContentPane().add(this);
@@ -46,63 +31,64 @@ public class GUI extends JComponent {
         display.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         addSizeInputBox();
-        addPainter();
+    
+        drawing = new GUICanvas();
+        display.add(drawing);
 
         frame.add(tool, BorderLayout.PAGE_START);
         frame.add(display, BorderLayout.CENTER);
         frame.pack();
         frame.setLocationRelativeTo(null); // window appears in center
+        
     
-        g2d = (Graphics2D) drawing.getGraphics();
+        hextess = new HexTess(frame.getWidth() * 0.25);
     }
 
     private void addSizeInputBox() {
         input = new JTextField(5);
         input.setMaximumSize(new Dimension(0, 25));
-        input.addActionListener(new ActionListener() { //on pressing enter, redraw hextess
-                                    @Override
-                                    public void actionPerformed(ActionEvent e) {
-                                        try {
-                                            hextess.initialise(input.getText());
-                                        } catch(IllegalArgumentException exc) {
-                                            String title = "Out of bounds";
-                                            if(exc instanceof NumberFormatException)
-                                                title = "Invalid Input";
-
-                                            JOptionPane.showMessageDialog(frame,
-                                                exc.getMessage(), title, JOptionPane.WARNING_MESSAGE);
-                                        }
-                                        
-                                        List<Shape> shapes = hextess.evalShapes();
-                                        
-                                        for(Shape s : shapes)
-                                            g2d.draw(s);
-                                        System.out.println(i++);
-                                    }
-                                });
+    
         input.setToolTipText("Enter size (0-20)");
         input.setHorizontalAlignment(SwingConstants.CENTER);
-
+    
         input.setBorder(BorderFactory.createBevelBorder(2));
-
+    
         tool.add(new JLabel("Size: "));
+        
+        //on pressing enter, redraw hextess
+        input.addActionListener(e -> {
+            if(!isInputError())
+                drawing.drawOnCanvas(hextess.evalShapes());
+        });
+        
         tool.add(input);
     }
 
-    private void addPainter() {
-        drawing = new JComponent() {
-            protected void paintComponent(Graphics g) {
-                redraw(g);
-            }
-        };
-
-        drawing.setPreferredSize(new Dimension(800,
-                500));
-        drawing.setBorder(BorderFactory.createBevelBorder(2));
-        display.add(drawing);
+    private boolean isInputError() {
+        try {
+            
+            hextess.initialise(input.getText());
+            return false;
+            
+        } catch(IllegalArgumentException exc) {
+        
+            //choose isInputError display title
+            String title = "Out of bounds";
+            if(exc instanceof NumberFormatException)
+                title = "Invalid Input";
+        
+            JOptionPane.showMessageDialog(frame,
+                    exc.getMessage(), title, JOptionPane.WARNING_MESSAGE);
+            
+            return true;
+        }
     }
-
-
+    
+//    private void drawTess() {
+//        List<Shape> tess = hextess.evalShapes();
+//            for(Shape s : tess)
+//                g2d.draw(s);
+//    }
 
 
     public static void main(String[] s) {

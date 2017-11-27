@@ -8,6 +8,7 @@ import java.util.List;
  * Created by Dan Ko on 9/12/2017.
  */
 public class HexTess {
+    private double offset;
     private double SIZE = 0;
     private double sixth;
     //private List<Shape> shapes = new ArrayList<Shape>();
@@ -19,7 +20,10 @@ public class HexTess {
     private double[] hexY;
     private double[] hexBotX = new double[6];
     private double[] hexBotY = new double[6];
-
+    
+    public HexTess(double offset) {
+        this.offset = offset;
+    }
 
     public void setSize(String size) throws NumberFormatException, IllegalFormatException{
         try {
@@ -42,13 +46,13 @@ public class HexTess {
         } catch(IllegalFormatException e) {
             throw new IllegalArgumentException(e.getMessage());
         }
-        shapes = new ArrayList<Shape>();
+        shapes = new ArrayList<>();
         sixth = SIZE / 6.0;
     }
 
     public List<Shape> evalShapes() {
-        initTessie(0, 0, false, Color.red);
-        initTessie(0, SIZE, true, Color.blue);
+        initTessie(offset, 0, false, Color.red);
+        initTessie(offset, SIZE, true, Color.blue);
 
         return this.shapes;
     }
@@ -154,6 +158,7 @@ public class HexTess {
 
     private void addShape(Path2D.Double path) {
         path.moveTo(xC[0], yC[0]);
+        
         for(int i = 0; i < xC.length; i++) {
             path.lineTo(xC[i], yC[i]);
         }
@@ -166,7 +171,7 @@ public class HexTess {
      */
     private double[] flipper(double[] mirror, double y) {
         for (int b = 0; b < 4; b++)
-            mirror[b] = (2 * y + SIZE) - mirror[b]; // this formula flips the y coordinate. X remains same.
+            mirror[b] = (2 * y ) - mirror[b]; // this formula flips the y coordinate. X remains same.
 
         return mirror;
     }
