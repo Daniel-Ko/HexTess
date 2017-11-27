@@ -8,7 +8,7 @@ import java.awt.Shape;
 import java.util.List;
 
 /**
- * Created by Deko on 27/11/2017.
+ * PaintComponent to repaint upon each change of field:shapes
  */
 public class GUICanvas extends JComponent {
     List<Shape> shapes;
@@ -28,9 +28,11 @@ public class GUICanvas extends JComponent {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
         
-        if(shapes != null || !shapes.isEmpty()) {
-            for(Shape s : shapes)
-                g2d.draw(s);
+        if(shapes != null) {
+            if(!shapes.isEmpty()) {
+                for (Shape s : shapes)
+                    g2d.draw(s);
+            }
         }
     }
     
