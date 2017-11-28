@@ -1,6 +1,13 @@
-
-
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 
@@ -83,13 +90,6 @@ public class GUI extends JComponent {
             return true;
         }
     }
-    
-//    private void drawTess() {
-//        List<Shape> tess = hextess.evalShapes();
-//            for(Shape s : tess)
-//                g2d.draw(s);
-//    }
-
 
     public static void main(String[] s) {
         SwingUtilities.invokeLater(()-> new GUI());

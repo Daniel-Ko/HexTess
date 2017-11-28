@@ -8,18 +8,15 @@ import java.util.List;
  * Created by Dan Ko on 9/12/2017.
  */
 public class HexTess {
+    private int[] grid;
     private double offset;
-    private double SIZE = 0;
+    public static int SIZE;
     private double sixth;
     //private List<Shape> shapes = new ArrayList<Shape>();
     private List<Shape> shapes;
     //fields used in initTessie and its submethods
     private double[] xC;
     private double[] yC;
-    private double[] hexX;
-    private double[] hexY;
-    private double[] hexBotX = new double[6];
-    private double[] hexBotY = new double[6];
     
     public HexTess(double offset) {
         this.offset = offset;
@@ -32,12 +29,20 @@ public class HexTess {
                 throw new IllegalArgumentException("Choose a size (0-20)");
             SIZE = tessSize;
 
+            grid = new int[SIZE];
+
         } catch(NumberFormatException e) {
             throw new NumberFormatException("Not a number");
         } catch(IllegalArgumentException e) {
             throw new IllegalArgumentException(e.getMessage());
         }
     }
+
+//    private void initGrid() {
+//        for(int i = 0; i < SIZE*2; i++)
+//            grid[i] = i;
+//    }
+
     /** Asks for a size to scale the tessellation and prepares data structures to evalShapes
      */
     public void initialise(String size) throws IllegalFormatException{
@@ -51,8 +56,8 @@ public class HexTess {
     }
 
     public List<Shape> evalShapes() {
-        initTessie(offset, 0, false, Color.red);
-        initTessie(offset, SIZE, true, Color.blue);
+        initTessie(0, 0, false, Color.red);
+        initTessie(0, SIZE, true, Color.blue);
 
         return this.shapes;
     }
@@ -75,11 +80,6 @@ public class HexTess {
         xC = xCoordsInitial;
         yC = yCoordsInitial;
 
-        /** hexagonal points **/ // we will be collecting x and y points from triangles
-
-        hexX = new double[6];
-        hexY = new double[6];
-
         for (int i = 0; i < 5; i++) { // we evalShapes 5 tesselating shapes from left to right on both the top and bottom.
             recordPath(i, bot);
         }
@@ -99,8 +99,6 @@ public class HexTess {
             if (!isBot)
                 shapes.add(new Rectangle2D.Double(xC[2], yC[2], sixth, 2.0 * sixth)); // leftmost rect draws once
 
-            hexdex(0, true, isBot, xC[1]); // hexagon coordinates are updated
-            hexdex(0, false, isBot, yC[1]);
 
         } else if (shapeNum == 1) { //tilted left square
             xC[3] = xC[2] + 2 * sixth;
@@ -125,9 +123,6 @@ public class HexTess {
             Path2D.Double midTri = new Path2D.Double();
             addShape(midTri);
 
-            hexdex(1, true, isBot, xC[1]);  //update coordinates again
-            hexdex(1, false, isBot, yC[1]);
-
         } else if (shapeNum == 3) { //tilted right square
             xC[3] = xC[0] + 2 * sixth;
             yC[3] = yC[0];
@@ -151,8 +146,6 @@ public class HexTess {
 
             if (!isBot)
                 shapes.add(new Rectangle2D.Double(xC[1], yC[1], sixth, 2.0 * sixth)); // rightmost rect draws once
-            hexdex(2, true, isBot, xC[1]);
-            hexdex(2, false, isBot, yC[1]);
         }
     }
 
@@ -185,22 +178,5 @@ public class HexTess {
             recordThreePoints[t] = recordThreePoints[t + 1];
 
         return recordThreePoints;
-    }
-
-    /** To record the outline of the hexagon, we record its vertices whenever a shape shares a corner with it
-     */
-    private void hexdex(int index, boolean x, boolean isBot, double val) {
-        if (!isBot) {
-            if (x)
-                hexX[index] = val;
-            else
-                hexY[index] = val;
-        } else {
-            index = 5 - index; //get reverse values
-            if (x)
-                hexBotX[index] = val;
-            else
-                hexBotY[index] = val;
-        }
     }
 }

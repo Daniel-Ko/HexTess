@@ -30,8 +30,12 @@ public class GUICanvas extends JComponent {
         
         if(shapes != null) {
             if(!shapes.isEmpty()) {
-                for (Shape s : shapes)
-                    g2d.draw(s);
+                for(int i = 0; i < HexTess.SIZE; i++) {
+                    for(Shape s : shapes) {
+                        g2d.translate((HexTess.SIZE * i / HexTess.SIZE), (i / HexTess.SIZE));
+                        g2d.draw(s);
+                    }
+                }
             }
         }
     }
