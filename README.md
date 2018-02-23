@@ -11,4 +11,4 @@ To do this, we note two observations:
 1) The hexagon tessellation requires 30+ vertices to draw between. The majority of these vertices, however, are shared between multiple smaller shapes. 
 2) The hexagon tessellation is mirrored across the x-axis.
 
-I am not loath to admit that anyone with this realisation could also sense that there are patterns to be found in the geometry that would let us take advantage of the interconnectivity and the symmetry. 
+Perhaps with this realisation we could also sense patterns in the geometry that would let us take advantage of the interconnectivity and symmetry. 
