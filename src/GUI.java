@@ -25,7 +25,6 @@ public class GUI extends JComponent {
     
     public GUI() {
         frame = new JFrame();
-        frame = new JFrame();
         frame.getContentPane().add(this);
         frame.setVisible(true);
 
@@ -46,11 +45,19 @@ public class GUI extends JComponent {
         frame.add(display, BorderLayout.CENTER);
         frame.pack();
         frame.setLocationRelativeTo(null); // window appears in center
-        
+
+        //determine what the max size is (the smaller of the two so drawing doesn't exceed borders)
+        int maxSize = (int) display.getHeight() > (int) display.getWidth() ?
+                (int) display.getWidth() :
+                (int) display.getWidth();
 
         //pass in absolute centre for hextess to create relative offset (messy but until GUICanvas can transform points...)
-        hextess = new HexTess(new Point2D.Double(
-                frame.getWidth() / 2.0, frame.getHeight() / 2.0));
+        hextess = new HexTess(
+                new Point2D.Double(
+                        display.getWidth() / 2.0,
+                        display.getHeight() / 2.0),
+                maxSize
+                );
     }
 
     private void addSizeInputBox() {

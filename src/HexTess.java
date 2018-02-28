@@ -12,7 +12,7 @@ import java.util.List;
  * Created by Dan Ko on 9/12/2017.
  */
 public class HexTess {
-    public final int MAXSIZE = 500;
+    public final int MAXSIZE;
     public final int MINSIZE = 0;
 
     private final Point2D.Double CENTRE_SCREEN;
@@ -31,8 +31,9 @@ public class HexTess {
 
 
     
-    public HexTess(Point2D.Double centre) {
+    public HexTess(Point2D.Double centre, int maxSize) {
         CENTRE_SCREEN = centre;
+        MAXSIZE = maxSize;
     }
 
     public void setSize(String size) throws NumberFormatException, IllegalFormatException {
@@ -66,8 +67,8 @@ public class HexTess {
     }
 
     public List<Shape> evalShapes() {
-        initTessie(x_offset, y_offset, false, Color.red);
-        initTessie(x_offset, y_offset+SIZE, true, Color.blue);
+        initTessie(x_offset, y_offset, false, Color.red); //run through top shapes (including the squares on the sides)
+        initTessie(x_offset, y_offset+SIZE, true, Color.blue); //run through the bottom shapes
 
         return this.shapes;
     }
@@ -77,20 +78,16 @@ public class HexTess {
      */
     private void initTessie(double x, double y, boolean bot, Color color) {
 
-        /** arrays to record coordinates **/
-
-        // x will always be the same as we traverse from left to right
+        // x will always be the same as we traverse from left to right. Only record x absolute positions
         double[] xCoordsInitial = { x, x + sixth, x, x };
         // setting y as if we were traversing top
-        double[] yCoordsInitial = { y, y + (2.0 * sixth), y + (2 * sixth), y + (2 * sixth) };
+        double[] yCoordsInitial = { y, y + (2.0 * sixth), y + (2.0 * sixth), y + (2.0 * sixth) };
 
         if (bot)
             yCoordsInitial = flipper(yCoordsInitial, y); // flipping y values to the bottom side
 
         xC = xCoordsInitial;
         yC = yCoordsInitial;
-
-        /** hexagonal points **/ // we will be collecting x and y points from triangles
 
 
         for (int i = 0; i < 5; i++) { // we evalShapes 5 tesselating shapes from left to right on both the top and bottom.
@@ -105,14 +102,19 @@ public class HexTess {
      */
     private void recordPath(int shapeNum, boolean isBot) {
 
+        //====================================================
         if (shapeNum == 0) { //left triangle + left square (latter only draws on top side iteration)
-            Path2D.Double triLeft = new Path2D.Double();
-            addShape(triLeft);
 
+            Path2D.Double triLeft = new Path2D.Double();
+            addPath(triLeft);
+
+            // Only on the top run do we process this left side square. Add directly to shapes, instead of using the
+            // addPath() method
             if (!isBot)
                 shapes.add(new Rectangle2D.Double(xC[2], yC[2], sixth, 2.0 * sixth)); // leftmost rect draws once
 
 
+        //====================================================
         } else if (shapeNum == 1) { //tilted left square
             xC[3] = xC[2] + 2 * sixth;
             yC[3] = yC[0];
@@ -124,8 +126,9 @@ public class HexTess {
                 yC[2] = yC[1] + sixth;
 
             Path2D.Double tiltedSqLeft = new Path2D.Double();
-            addShape(tiltedSqLeft);
+            addPath(tiltedSqLeft);
 
+        //====================================================
         } else if (shapeNum == 2) { //middle inverted triangle
             xC[0] = xC[3] + 2 * sixth;
             yC[0] = yC[3];
@@ -134,8 +137,9 @@ public class HexTess {
             triPrep(yC); // This assignment is also seen in step 4 and implied in step 0
 
             Path2D.Double midTri = new Path2D.Double();
-            addShape(midTri);
+            addPath(midTri);
 
+        //====================================================
         } else if (shapeNum == 3) { //tilted right square
             xC[3] = xC[0] + 2 * sixth;
             yC[3] = yC[0];
@@ -147,22 +151,28 @@ public class HexTess {
                 yC[2] = yC[1] - sixth;
 
             Path2D.Double tiltedSqRight = new Path2D.Double();
-            addShape(tiltedSqRight);
+            addPath(tiltedSqRight);
 
+        //====================================================
         } else if (shapeNum == 4) { //right triangle + right rectangle (latter only draws on top side iteration)
             xC[0] = xC[3];
             yC[0] = yC[2];
             triPrep(xC);
             triPrep(yC);
+
             Path2D.Double rightTri = new Path2D.Double();
-            addShape(rightTri);
+            addPath(rightTri);
 
             if (!isBot)
                 shapes.add(new Rectangle2D.Double(xC[1], yC[1], sixth, 2.0 * sixth)); // rightmost rect draws once
         }
     }
 
-    private void addShape(Path2D.Double path) {
+    /** Given a defined path, run through its figure and add the whole path to our field shapes
+     *
+     * @param path
+     */
+    private void addPath(Path2D.Double path) {
         path.moveTo(xC[0], yC[0]);
         
         for(int i = 0; i < xC.length; i++) {
@@ -174,10 +184,14 @@ public class HexTess {
     }
 
     /** This method changes each default (top) value into its bottom counterpart
+     *
+     * @param mirror
+     * @param y
+     * @return
      */
     private double[] flipper(double[] mirror, double y) {
         for (int b = 0; b < 4; b++)
-            mirror[b] = (2 * y ) - mirror[b]; // this formula flips the y coordinate. X remains same.
+            mirror[b] = (2 * y) - mirror[b]; // this formula flips the y coordinate. X remains same.
 
         return mirror;
     }
