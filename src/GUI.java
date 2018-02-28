@@ -1,5 +1,16 @@
+import javax.swing.BorderFactory;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.geom.Point2D;
 
 public class GUI extends JComponent {
 
@@ -19,11 +30,10 @@ public class GUI extends JComponent {
         frame.setVisible(true);
 
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-//        frame.setPreferredSize(getPreferredSize());
         this.setFocusable(true);
 
         // set up the rest of the frame
-        tool = new JPanel(); //BoxLayout(display, BoxLayout.LINE_AXIS)
+        tool = new JPanel();
         display = new JPanel();
         display.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
@@ -37,8 +47,10 @@ public class GUI extends JComponent {
         frame.pack();
         frame.setLocationRelativeTo(null); // window appears in center
         
-    
-        hextess = new HexTess(frame.getWidth() * 0.25);
+
+        //pass in absolute centre for hextess to create relative offset (messy but until GUICanvas can transform points...)
+        hextess = new HexTess(new Point2D.Double(
+                frame.getWidth() / 2.0, frame.getHeight() / 2.0));
     }
 
     private void addSizeInputBox() {
@@ -80,12 +92,6 @@ public class GUI extends JComponent {
             return true;
         }
     }
-    
-//    private void drawTess() {
-//        List<Shape> tess = hextess.evalShapes();
-//            for(Shape s : tess)
-//                g2d.draw(s);
-//    }
 
 
     public static void main(String[] s) {

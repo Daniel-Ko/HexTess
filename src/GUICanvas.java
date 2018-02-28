@@ -38,6 +38,6 @@ public class GUICanvas extends JComponent {
     
     @Override
     public Dimension getPreferredSize() {
-        return new Dimension(800, 500);
+        return new Dimension(800, 900);
     }
 }
