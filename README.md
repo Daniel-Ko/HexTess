@@ -3,7 +3,7 @@ Implementation is in Java
 
 An example of this tessellation:
 
-![Hexagon Tessellation] (https://qph.ec.quoracdn.net/main-qimg-004a26d70999fad8a1323bd219789b04-c)
+![Hexagon Tessellation](https://qph.ec.quoracdn.net/main-qimg-004a26d70999fad8a1323bd219789b04-c)
 
 The speciality of this algorithm is to find the most efficient vertex-assignment code as possible.
 
