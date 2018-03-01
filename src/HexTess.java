@@ -29,14 +29,12 @@ public class HexTess {
     private double[] yC;
 
 
-
-    
     public HexTess(Point2D.Double centre, int maxSize) {
         CENTRE_SCREEN = centre;
         MAXSIZE = maxSize;
     }
 
-    public void setSize(String size) throws NumberFormatException, IllegalFormatException {
+    private void setSize(String size) throws NumberFormatException, IllegalFormatException {
         try {
             int tessSize = Integer.parseInt(size);
             if(tessSize > MAXSIZE || tessSize < MINSIZE)
@@ -67,8 +65,8 @@ public class HexTess {
     }
 
     public List<Shape> evalShapes() {
-        initTessie(x_offset, y_offset, false, Color.red); //run through top shapes (including the squares on the sides)
-        initTessie(x_offset, y_offset+SIZE, true, Color.blue); //run through the bottom shapes
+        initTessie(x_offset, y_offset, false); //run through top shapes (including the squares on the sides)
+        initTessie(x_offset, y_offset+SIZE, true); //run through the bottom shapes
 
         return this.shapes;
     }
@@ -76,7 +74,7 @@ public class HexTess {
     /** Initialises x and y position arrays with initial values based on whether we are drawing top or bottom of tessellation.
      *   Once everything is prepared, it fires off 5 shapes to run through the algorithm in recordPath
      */
-    private void initTessie(double x, double y, boolean bot, Color color) {
+    private void initTessie(double x, double y, boolean bot) {
 
         // x will always be the same as we traverse from left to right. Only record x absolute positions
         double[] xCoordsInitial = { x, x + sixth, x, x };
