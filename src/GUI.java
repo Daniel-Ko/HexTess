@@ -74,7 +74,8 @@ public class GUI extends JComponent {
         //on pressing enter, redraw hextess
         input.addActionListener(e -> {
             if(!isInputError())
-                drawing.drawOnCanvas(hextess.evalShapes());
+                drawing.drawOnCanvas(
+                        hextess.evalShapes());
         });
         
         tool.add(input);
